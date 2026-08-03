@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Status lifecycle of a dealership vehicle
+enum VehicleStatus {
+  IN_STOCK
+  RESERVED
+  SOLD
+}
+
+/// Vehicle Entity: Represents dealership stock records
+model Vehicle {
+  id           String        @id @default(uuid())
+  vin          String        @unique @db.VarChar(17)
+  make         String        @db.VarChar(50)
+  model        String        @db.VarChar(50)
+  year         Int
+  price        Decimal       @db.Decimal(10, 2)
+  receivedDate DateTime      @map("received_date")
+  status       VehicleStatus @default(IN_STOCK)
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  actionLogs   ActionLog[]
+
+  // Indexes optimized for requirement: "filter by make, model, age"
+  @@index([make, model], name: "idx_vehicle_make_model")
+  @@index([receivedDate], name: "idx_vehicle_received_date")
+  @@map("vehicles")
+}
+
+/// ActionLog Entity: Immutable audit log for manager actions on aging stock
+model ActionLog {
+  id          String   @id @default(uuid())
+  vehicleId   String   @map("vehicle_id")
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  action      String   @db.VarChar(255)
+  notes       String?  @db.Text
+  createdById String?  @default("mgr_demo_101") @map("created_by_id") @db.VarChar(50)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Indexes optimized for retrieving historical logs & latest action per vehicle
+  @@index([vehicleId, createdAt(sort: Desc)], name: "idx_action_vehicle_created")
+  @@map("action_logs")
+}
