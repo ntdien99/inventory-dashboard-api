@@ -52,12 +52,6 @@ npx prisma dev --name inventory_dashboard --detach
 
 - Note: Paste displayed URL after running the above command to file ".env" for `DATABASE_URL`
 
-Generates Prisma Client based on schema.prisma:
-
-```bash
-npx prisma generate
-```
-
 Apply existing migrations to your local DB:
 
 ```bash
