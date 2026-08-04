@@ -48,7 +48,7 @@ model ActionLog {
   vehicle     Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
   action      String   @db.VarChar(255)
   notes       String?  @db.Text
-  createdById String?  @default("mgr_demo_101") @map("created_by_id") @db.VarChar(50)
+  createdById String   @map("created_by_id") @db.VarChar(50)
   createdAt   DateTime @default(now()) @map("created_at")
 
   // Indexes optimized for retrieving historical logs & latest action per vehicle

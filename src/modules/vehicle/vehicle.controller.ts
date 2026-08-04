@@ -4,8 +4,6 @@ import { getVehiclesQuerySchema } from "@/modules/vehicle/vehicle.schema";
 import type { AuthenticatedRequest } from "@/shared/middleware/authStub";
 import type { VehicleFilterQuery } from "@/modules/vehicle/vehicle.types";
 
-// const vehicleService = new VehicleService();
-
 export class VehicleController {
   constructor(private vehicleService: VehicleService) {}
   public async getVehicles(req: AuthenticatedRequest, res: Response, next: NextFunction) {

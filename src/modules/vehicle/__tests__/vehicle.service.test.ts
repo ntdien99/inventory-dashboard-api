@@ -139,7 +139,7 @@ describe("VehicleService", () => {
             status: VehicleStatus.IN_STOCK,
             make: { equals: "Toyota", mode: "insensitive" },
             model: { equals: "Camry", mode: "insensitive" },
-            receivedDate: { lte: expect.any(Date) },
+            receivedDate: { lt: expect.any(Date) },
           }),
           skip: 5,
           take: 5,
@@ -157,7 +157,7 @@ describe("VehicleService", () => {
             status: VehicleStatus.IN_STOCK,
             make: { equals: "Toyota", mode: "insensitive" },
             model: { equals: "Camry", mode: "insensitive" },
-            receivedDate: { lte: expect.any(Date) },
+            receivedDate: { lt: expect.any(Date) },
           }),
         }),
       );

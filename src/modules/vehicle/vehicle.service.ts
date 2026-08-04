@@ -5,10 +5,11 @@ import { VehicleStatus } from "../../../generated/prisma/browser";
 
 export class VehicleService {
   private AGING_THRESHOLD_DAYS = 90;
+  private MS_PER_DAY = 1000 * 60 * 60 * 24;
 
   public calculateAgeInDays(receivedDate: Date): number {
     const diffTime = Math.abs(Date.now() - new Date(receivedDate).getTime());
-    return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    return Math.floor(diffTime / this.MS_PER_DAY);
   }
 
   public isVehicleAging(receivedDate: Date): boolean {
@@ -24,11 +25,14 @@ export class VehicleService {
 
     if (filters.make) where.make = { equals: filters.make, mode: "insensitive" };
     if (filters.model) where.model = { equals: filters.model, mode: "insensitive" };
+    const ninetyDaysAgo = new Date();
+    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - this.AGING_THRESHOLD_DAYS);
 
-    if (filters.isAging) {
-      const ninetyDaysAgo = new Date();
-      ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - this.AGING_THRESHOLD_DAYS);
-      where.receivedDate = { lte: ninetyDaysAgo };
+    // If not specified, we don't filter by aging status. If true, we filter for vehicles older than 90 days. If false, we filter for vehicles newer than 90 days.
+    if (filters.isAging === true) {
+      where.receivedDate = { lt: ninetyDaysAgo };
+    } else if (filters.isAging === false) {
+      where.receivedDate = { gte: ninetyDaysAgo };
     }
 
     const [items, totalCount] = await Promise.all([
@@ -51,7 +55,7 @@ export class VehicleService {
       return {
         ...v,
         ageInDays,
-        isAging: ageInDays > this.AGING_THRESHOLD_DAYS,
+        isAging: this.isVehicleAging(v.receivedDate),
         latestAction: v.actionLogs[0] || null,
       };
     });
@@ -83,7 +87,7 @@ export class VehicleService {
     return {
       ...vehicle,
       ageInDays,
-      isAging: ageInDays > this.AGING_THRESHOLD_DAYS,
+      isAging: this.isVehicleAging(vehicle.receivedDate),
       latestAction: vehicle.actionLogs[0] || null,
     };
   }

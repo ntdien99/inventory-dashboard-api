@@ -35,7 +35,6 @@ const customJsonFormat = format.printf(
 const logFormat = format.combine(
   format.timestamp({ format: "YYYY-MM-DD HH:mm:ss.SS Z" }),
   format.errors({ stack: true }),
-  // format.json(),
   customJsonFormat,
 );
 
