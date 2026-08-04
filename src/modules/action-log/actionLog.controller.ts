@@ -9,7 +9,7 @@ export class ActionLogController {
     try {
       const { id: vehicleId } = req.params;
       const validatedBody = createActionLogSchema.parse(req.body);
-      const userId = req.user?.id || "mgr_demo_101";
+      const userId = req.user?.id;
 
       const actionLog = await this.actionLogService.createActionLog(
         vehicleId as string,
